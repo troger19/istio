@@ -1,0 +1,27 @@
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: hostnamej
+spec:
+  hosts:
+  - "hostnamej.example.com"
+  gateways:
+  - hostnamej-gateway
+  http:
+  - match:
+    - headers:
+        cookie:
+          regex: "^(.*?;)?(user=test)(;.*)?$"
+    route:
+    - destination:
+        port:
+          number: 8456
+        host: hostnamej
+        subset: v2
+  - route:
+    - destination:
+        port:
+          number: 8456
+        host: hostnamej
+        subset: v1

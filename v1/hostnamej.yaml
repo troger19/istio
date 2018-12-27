@@ -1,0 +1,44 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: hostnamej-v1
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: hostnamej
+  strategy:
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: hostnamej
+        version: v1
+    spec:
+      containers:
+      - image: 172.30.1.1:5000/myproject/istio-v1:latest
+        imagePullPolicy: Always
+        name: hostnamej
+        resources: {}
+      restartPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: hostnamej
+  name: hostnamej
+spec:
+  externalTrafficPolicy: Cluster
+  ports:
+  - nodePort: 31576
+    port: 8456
+    protocol: TCP
+    targetPort: 8456
+  selector:
+    app: hostnamej
+  sessionAffinity: None
+  type: LoadBalancer
